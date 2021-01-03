@@ -14,7 +14,7 @@ variable "sub_id" {
 }
 
 variable "num_of_instances" {
-  type        = number
+  type        = string
 }
 
 variable "intance_type" {
@@ -27,7 +27,7 @@ variable "private_key_name" {
 }
 
 variable "server_sg" {
-  type        = any
+  type        = list(string)
 }
 
 variable "script" {
@@ -36,4 +36,9 @@ variable "script" {
 
 variable "iam" {
   type        = string
+}
+
+variable "tags" {
+  type        = map(string)
+  default     = {}
 }

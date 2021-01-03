@@ -1,7 +1,7 @@
 # VPC OUTPUT
 
-output "vpc" {
-    value = aws_vpc.vpc.*.id
+output "vpc_id" {
+    value = aws_vpc.vpc.id
 }
 
 output "igw" {
@@ -28,10 +28,26 @@ output "rt_publicsub" {
     value = aws_route_table.rt_publicsub.*.id
 }
 
-output "sg" {
-    value = aws_security_group.sg.id
+output "alb_sg" {
+    value = aws_security_group.alb_sg.id
 }
 
-#output "consul_iam_profile" {
-#    value = aws_iam_role.consul-join.name
-#}
+output "consul_server_sg" {
+    value = aws_security_group.consul_server_sg.id
+}
+
+output "jenkins_server_sg" {
+    value = aws_security_group.jenkins_server_sg.id
+}
+
+output "kandula_sg" {
+    value = aws_security_group.kandula_sg.id
+}
+
+output "ssh_sg" {
+    value = aws_security_group.ssh_sg.id
+}
+
+output "consul_iam_profile" {
+    value = aws_iam_instance_profile.consul-iam.name
+}
