@@ -19,7 +19,7 @@ module "consul_servers" {
     project_name                 = "kandula"
     server_name                  = "consul_server"
     intance_type                 = "t2.micro"
-    private_key_name             = "<YOUR-PK-NAME-HERE>"
+    private_key_name             = "my-opsschool-kp"
 
     tags = {
         consul_server = "true"
@@ -40,7 +40,7 @@ module "jenkins_server" {
     project_name                 = "kandula"
     server_name                  = "jenkins_server"
     intance_type                 = "t2.micro"
-    private_key_name             = "<YOUR-PK-NAME-HERE>"
+    private_key_name             = "my-opsschool-kp"
 
     tags = {
         consul_server = "false"
@@ -61,7 +61,7 @@ module "jenkins_agent" {
     project_name                 = "kandula"
     server_name                  = "jenkins_agent"
     intance_type                 = "t2.micro"
-    private_key_name             = "<YOUR-PK-NAME-HERE>"
+    private_key_name             = "my-opsschool-kp"
 
     tags = {
         consul_server = "false"
@@ -81,7 +81,7 @@ module "bastion_host" {
     project_name                 = "kandula"
     server_name                  = "bastion_host"
     intance_type                 = "t2.micro"
-    private_key_name             = "<YOUR-PK-NAME-HERE>"
+    private_key_name             = "my-opsschool-kp"
     iam                          = ""
 
     tags = {
@@ -100,4 +100,31 @@ module "alb" {
     vpc                          = module.vpc.vpc_id
     instances_id_jenkins         = module.jenkins_server.instance_id
     instances_id_consul          = module.consul_servers.instance_id
+}
+
+module "eks" {
+    source                      = "terraform-aws-modules/eks/aws"
+    cluster_name                = local.cluster_name
+    cluster_version             = var.kubernetes_version
+    subnets                     = module.vpc.private_sub
+    vpc_id                      = module.vpc.vpc_id
+    enable_irsa                 = true
+
+    worker_groups = [
+    {
+      name                          = "kandula-worker-group-1"
+      instance_type                 = "t3.medium"
+      additional_userdata           = "echo foo bar"
+      asg_desired_capacity          = 2
+      additional_security_group_ids = [module.vpc.kandula_sg]
+    },
+    {
+      name                          = "kandula-worker-group-2"
+      instance_type                 = "t3.medium"
+      additional_userdata           = "echo foo bar"
+      asg_desired_capacity          = 2
+      additional_security_group_ids = [module.vpc.kandula_sg]
+    }
+  ]
+
 }
