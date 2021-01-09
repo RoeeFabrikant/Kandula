@@ -92,34 +92,34 @@ sh -c 'echo deb https://pkg.jenkins.io/debian-stable binary/ > \
     /etc/apt/sources.list.d/jenkins.list'
 apt-get update -y
 apt install openjdk-8-jdk -y
+apt install docker.io -y
+systemctl start docker
+systemctl enable docker
+usermod -aG docker ubuntu
+apt-get update && sudo apt-get install -y apt-transport-https gnupg2 curl
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
+apt-get update
+apt-get install -y kubectl
 
 tee /etc/consul.d/jenkins-agent.json > /dev/null <<"EOF"
 {
   "service": {
     "id": "jenkins_agent",
     "name": "jenkins_agent",
-    "port": 22,
     "checks": [
       {
-        "id": "tcp",
-        "name": "TCP on port 8080",
-        "tcp": "localhost:8080",
-        "interval": "10s",
-        "timeout": "1s"
-      },
-      {
-        "id": "http",
-        "name": "HTTP on port 8080",
-        "http": "http://localhost:8080/login",
-        "interval": "30s",
-        "timeout": "1s"
+        "id": "service",
+        "name": "docker service",
+        "args": ["systemctl", "status", "docker.service"],
+        "interval": "60s"
       },
       {
         "id": "service",
-        "name": "jenkins server service",
-        "args": ["systemctl", "status", "jenkins.service"],
+        "name": "K8's service",
+        "args": ["systemctl", "status", "kubelet.service"],
         "interval": "60s"
-      }
+      }      
     ]
   }
 }

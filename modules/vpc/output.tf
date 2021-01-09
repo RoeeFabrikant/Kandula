@@ -48,6 +48,10 @@ output "ssh_sg" {
     value = aws_security_group.ssh_sg.id
 }
 
+output "all_worker_mgmt" {
+    value = aws_security_group.all_worker_mgmt.id
+}
+
 output "consul_iam_profile" {
     value = aws_iam_instance_profile.consul-iam.name
 }

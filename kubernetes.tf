@@ -11,8 +11,8 @@ module "iam_assumable_role_admin" {
 
 resource "kubernetes_service_account" "kandula_sa" {
   metadata {
-    name      = local.k8s_service_account_name
-    namespace = local.k8s_service_account_namespace
+    name        = local.k8s_service_account_name
+    namespace   = local.k8s_service_account_namespace
     annotations = {
       "eks.amazonaws.com/role-arn" = module.iam_assumable_role_admin.this_iam_role_arn
     }

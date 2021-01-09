@@ -93,6 +93,15 @@ sh -c 'echo deb https://pkg.jenkins.io/debian-stable binary/ > \
 apt-get update -y
 apt install openjdk-8-jdk -y
 apt-get install jenkins -y
+apt install docker.io -y
+systemctl start docker
+systemctl enable docker
+usermod -aG docker ubuntu
+apt-get update && sudo apt-get install -y apt-transport-https gnupg2 curl
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
+apt-get update
+apt-get install -y kubectl
 
 tee /etc/consul.d/jenkins-server.json > /dev/null <<"EOF"
 {

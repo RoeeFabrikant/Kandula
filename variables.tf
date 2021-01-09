@@ -8,7 +8,6 @@ variable "kubernetes_version" {
   description     = "kubernetes version"
 }
 
-
 resource "random_string" "suffix" {
   length          = 8
   special         = false
@@ -19,7 +18,7 @@ locals {
 }
 
 locals {
-  k8s_service_account_namespace = "kandula"
+  k8s_service_account_namespace = "default"
   k8s_service_account_name      = "kandula-sa"
 }
 

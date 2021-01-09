@@ -30,14 +30,15 @@ terraform {
   }
 }
 
+# terraform {
+#    backend "s3" {
+#        bucket  = var.terraform_remote_state_s3
+#        key     = "terraform-session3-hw/terraform/terraform.tfstate"
+#        region  = "us-east-1"
+#    }
+# }
+
 #terraform {
 #  required_version = "0.13.4"
 #}
 
-#terraform {
-#    backend "s3" {
-#        bucket  = "<YOUR-BACKEND-BUCKET-NAME-HERE>"
-#        key     = "terraform-session3-hw/terraform/terraform.tfstate"
-#        region  = "us-east-1"
-#    }
-#}

@@ -1,7 +1,10 @@
 resource "aws_vpc" "vpc" {
     cidr_block                  = var.vpc_cidr
+    enable_dns_hostnames = true
+    enable_dns_support   = true
     tags = {
         "Name" = "${var.project_name}_vpc"
+        "kubernetes.io/cluster/${var.k8s_cluster_name}" = "shared"
     }
 }
 
@@ -20,6 +23,8 @@ resource "aws_subnet" "private_sub" {
     cidr_block                  = var.private_subnet_cidr[count.index]
     tags = {
         "Name" = "${var.project_name}_private_sub_az${count.index}"
+        "kubernetes.io/cluster/${var.k8s_cluster_name}" = "shared"
+        "kubernetes.io/role/internal-elb"             = "1"
     }
 }
 
@@ -31,6 +36,8 @@ resource "aws_subnet" "public_sub" {
     cidr_block                  = var.public_subnet_cidr[count.index]
     tags = {
         "Name" = "${var.project_name}_public_sub_az${count.index}"
+        "kubernetes.io/cluster/${var.k8s_cluster_name}" = "shared"
+        "kubernetes.io/role/elb"                      = "1"
     }
 }
 
