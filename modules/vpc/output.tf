@@ -55,3 +55,11 @@ output "all_worker_mgmt" {
 output "consul_iam_profile" {
     value = aws_iam_instance_profile.consul-iam.name
 }
+
+output "admin_iam_profile_name" {
+    value = aws_iam_instance_profile.admin_profile.name
+}
+
+output "admin_iam_profile_arn" {
+    value = aws_iam_instance_profile.admin_profile.arn
+}

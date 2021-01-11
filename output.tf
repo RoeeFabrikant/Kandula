@@ -48,3 +48,7 @@ output "cluster_name" {
   description = "Kubernetes Cluster Name"
   value       = local.cluster_name
 }
+
+output "admin_iam_profile_arn" {
+  value       = module.vpc.admin_iam_profile_arn
+}

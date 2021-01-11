@@ -57,7 +57,7 @@ module "jenkins_agent" {
     num_of_instances             = 2
     sub_id                       = module.vpc.private_sub                      # Don't change this line
     server_sg                    = [module.vpc.kandula_sg]                     # Don't change this line
-    iam                          = module.vpc.consul_iam_profile               # Don't change this line 
+    iam                          = module.vpc.admin_iam_profile_name           # Don't change this line 
 
     script                       = "./files/scripts/jenkins_agent.sh"
     project_name                 = "kandula"

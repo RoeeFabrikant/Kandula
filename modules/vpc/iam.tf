@@ -21,3 +21,19 @@ resource "aws_iam_instance_profile" "consul-iam" {
   name                  = "consul-iam"
   role                  = aws_iam_role.consul_iam_role.name
 }
+
+resource "aws_iam_role" "admin_iam" {
+  name                  = "admin-full-access"
+  assume_role_policy    = file("./files/iam/AdminFullAccess-iam.json")
+}
+
+resource "aws_iam_role_policy" "admin_policy" {
+  name                  = "admin-full-access"
+  role                  = aws_iam_role.admin_iam.name
+  policy                = file("./files/iam/AdminFullAccess-policy.json")
+}
+
+resource "aws_iam_instance_profile" "admin_profile" {
+  name                  = "admin-full-access"
+  role                  = aws_iam_role.admin_iam.name
+}
