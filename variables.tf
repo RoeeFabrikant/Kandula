@@ -3,15 +3,15 @@ variable "aws_region" {
   default         = "us-east-1"
 }
 
-variable "terraform_remote_state_s3" {
-  description     = "Remote tfstate file"
-  default         = "opsschool-terraform-bucket"
-}
-
 variable "kubernetes_version" {
   default         = 1.18
   description     = "kubernetes version"
 }
+
+variable "KP" {
+  description     = "your KP name for AWS Instances"
+}
+
 
 resource "random_string" "suffix" {
   length          = 8

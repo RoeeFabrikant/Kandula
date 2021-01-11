@@ -21,7 +21,7 @@ module "consul_servers" {
     project_name                 = "kandula"
     server_name                  = "consul_server"
     intance_type                 = "t2.micro"
-    private_key_name             = "my-opsschool-kp"
+    private_key_name             = var.KP
 
     tags = {
         consul_server = "true"
@@ -42,7 +42,7 @@ module "jenkins_server" {
     project_name                 = "kandula"
     server_name                  = "jenkins_server"
     intance_type                 = "t2.micro"
-    private_key_name             = "my-opsschool-kp"
+    private_key_name             = var.KP
 
     tags = {
         consul_server = "false"
@@ -63,7 +63,7 @@ module "jenkins_agent" {
     project_name                 = "kandula"
     server_name                  = "jenkins_agent"
     intance_type                 = "t2.micro"
-    private_key_name             = "my-opsschool-kp"
+    private_key_name             = var.KP
 
     tags = {
         consul_server = "false"
@@ -83,7 +83,7 @@ module "bastion_host" {
     project_name                 = "kandula"
     server_name                  = "bastion_host"
     intance_type                 = "t2.micro"
-    private_key_name             = "my-opsschool-kp"
+    private_key_name             = var.KP
     iam                          = ""
 
     tags = {
