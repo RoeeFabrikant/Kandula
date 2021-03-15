@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-sleep 60
+sleep 120
 ### set consul version
 echo 'CONSUL_VERSION="1.8.5"' >> /etc/environment
 export CONSUL_VERSION="1.8.5"
@@ -103,6 +103,13 @@ echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/
 apt-get update
 apt-get install -y kubectl
 
+# Install Helm
+curl https://baltocdn.com/helm/signing.asc | sudo apt-key add -
+apt-get install apt-transport-https --yes
+echo "deb https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+apt-get update -y
+apt-get install helm
+
 tee /etc/consul.d/jenkins-server.json > /dev/null <<"EOF"
 {
   "service": {
@@ -135,6 +142,42 @@ tee /etc/consul.d/jenkins-server.json > /dev/null <<"EOF"
 }
 EOF
 
-consul reload
+# Install NodeExporter
 
+export node_exporter_ver="0.18.0"
+wget \
+  https://github.com/prometheus/node_exporter/releases/download/v$node_exporter_ver/node_exporter-$node_exporter_ver.linux-amd64.tar.gz \
+  -O /tmp/node_exporter-$node_exporter_ver.linux-amd64.tar.gz
+
+tar zxvf /tmp/node_exporter-$node_exporter_ver.linux-amd64.tar.gz
+cp ./node_exporter-$node_exporter_ver.linux-amd64/node_exporter /usr/local/bin
+useradd --no-create-home --shell /bin/false node_exporter
+chown node_exporter:node_exporter /usr/local/bin/node_exporter
+mkdir -p /var/lib/node_exporter/textfile_collector
+chown node_exporter:node_exporter /var/lib/node_exporter
+chown node_exporter:node_exporter /var/lib/node_exporter/textfile_collector
+tee /etc/systemd/system/node_exporter.service &>/dev/null << EOF
+[Unit]
+Description=Node Exporter
+Wants=network-online.target
+After=network-online.target
+[Service]
+User=node_exporter
+Group=node_exporter
+Type=simple
+ExecStart=/usr/local/bin/node_exporter --collector.textfile.directory /var/lib/node_exporter/textfile_collector \
+ --no-collector.infiniband
+[Install]
+WantedBy=multi-user.target
+EOF
+
+rm -rf /tmp/node_exporter-$node_exporter_ver.linux-amd64.tar.gz \
+  ./node_exporter-$node_exporter_ver.linux-amd64
+
+systemctl daemon-reload
+systemctl start node_exporter
+systemctl enable node_exporter
+
+
+consul reload
 exit 0

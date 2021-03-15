@@ -28,10 +28,6 @@ output "rt_publicsub" {
     value = aws_route_table.rt_publicsub.*.id
 }
 
-output "alb_sg" {
-    value = aws_security_group.alb_sg.id
-}
-
 output "consul_server_sg" {
     value = aws_security_group.consul_server_sg.id
 }
@@ -42,10 +38,6 @@ output "jenkins_server_sg" {
 
 output "kandula_sg" {
     value = aws_security_group.kandula_sg.id
-}
-
-output "ssh_sg" {
-    value = aws_security_group.ssh_sg.id
 }
 
 output "all_worker_mgmt" {
@@ -63,3 +55,11 @@ output "admin_iam_profile_name" {
 output "admin_iam_profile_arn" {
     value = aws_iam_instance_profile.admin_profile.arn
 }
+
+# output "alb_sg" {
+#     value = aws_security_group.alb_sg.id
+# }
+
+# output "ssh_sg" {
+#     value = aws_security_group.ssh_sg.id
+# }

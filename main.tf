@@ -72,40 +72,9 @@ module "jenkins_agent" {
     }
 }
 
-module "bastion_host" {
-    source = "./modules/instance"
-
-    num_of_instances             = 1
-    sub_id                       = module.vpc.public_sub                       # Don't change this line
-    server_sg                    = [module.vpc.ssh_sg, module.vpc.kandula_sg]  # Don't change this line
-
-    script                       = "./files/scripts/empty.sh"
-    project_name                 = "kandula"
-    server_name                  = "bastion_host"
-    intance_type                 = "t2.micro"
-    private_key_name             = var.KP
-    iam                          = ""
-
-    tags = {
-        consul_server = "false"
-        type          = "bastion_host"
-        version       = "1.0"
-    }
-}
-
-module "alb" {
-    source = "./modules/alb"
-
-    project_name                 = "kandula"
-    subnets                      = module.vpc.public_sub
-    security_groups              = module.vpc.alb_sg 
-    vpc                          = module.vpc.vpc_id
-    instances_id_jenkins         = module.jenkins_server.instance_id
-    instances_id_consul          = module.consul_servers.instance_id
-}
-
 module "eks" {
     source                      = "terraform-aws-modules/eks/aws"
+    version                     = "13.2.1"
     cluster_name                = local.cluster_name
     cluster_version             = var.kubernetes_version
     subnets                     = module.vpc.private_sub
@@ -118,14 +87,14 @@ module "eks" {
       instance_type                 = "t3.medium"
       additional_userdata           = "echo foo bar"
       asg_desired_capacity          = 2
-      additional_security_group_ids = [module.vpc.all_worker_mgmt]
+      additional_security_group_ids = [module.vpc.all_worker_mgmt, module.vpc.kandula_sg]
     },
     {
       name                          = "kandula-worker-group-2"
       instance_type                 = "t3.medium"
       additional_userdata           = "echo foo bar"
       asg_desired_capacity          = 2
-      additional_security_group_ids = [module.vpc.all_worker_mgmt]
+      additional_security_group_ids = [module.vpc.all_worker_mgmt, module.vpc.kandula_sg]
     }
   ]
 
