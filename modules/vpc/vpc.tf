@@ -90,3 +90,11 @@ resource "aws_route_table_association" "associate_route_public_sub" {
     subnet_id                   = aws_subnet.public_sub.*.id[count.index]
     route_table_id              = aws_route_table.rt_publicsub.*.id[count.index]
 }
+
+resource "aws_route53_zone" "kandula_route53_zone" {
+  name = var.route53_zone_name
+
+  vpc {
+    vpc_id = aws_vpc.vpc.id
+  }
+}

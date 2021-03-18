@@ -56,6 +56,10 @@ output "admin_iam_profile_arn" {
     value = aws_iam_instance_profile.admin_profile.arn
 }
 
+output "aws_route53_zone_id" {
+    value = aws_route53_zone.kandula_route53_zone.zone_id
+}
+
 # output "alb_sg" {
 #     value = aws_security_group.alb_sg.id
 # }

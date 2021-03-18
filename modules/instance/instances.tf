@@ -15,3 +15,12 @@ resource "aws_instance" "instances" {
       var.tags
     ) 
 }
+
+resource "aws_route53_record" "route53_record" {
+  count   = var.num_of_instances
+  zone_id = var.route53_zone_id
+  name    = "${var.dns_name}_${count.index+1}"
+  type    = "A"
+  ttl     = 60
+  records = [aws_instance.instances.*.private_ip[count.index%2]]
+}
