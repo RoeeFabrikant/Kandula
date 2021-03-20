@@ -102,7 +102,7 @@ module "mysql" {
     }
 }
 
-module "mysql" {
+module "elk" {
     source = "./modules/instance"
 
     num_of_instances             = 1
