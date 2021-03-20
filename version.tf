@@ -32,7 +32,7 @@ terraform {
 
 terraform {
    backend "s3" {
-       bucket  = "<YOUR-S3-BUCKET-NAME>"
+       bucket  = "opsschool-terraform-bucket"
        key     = "terraform-kandula/terraform.tfstate"
        region  = "us-east-1"
    }

@@ -28,3 +28,7 @@ variable "public_subnet_cidr" {
 variable "k8s_cluster_name" {
   type        = string
 }
+
+variable "route53_zone_name" {
+  type        = string
+}

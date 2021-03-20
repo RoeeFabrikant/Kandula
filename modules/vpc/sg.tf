@@ -1,41 +1,3 @@
-resource "aws_security_group" "alb_sg" {
-  name        = "${var.project_name}_alb_sg"
-  description = "Allow HTTP"
-  vpc_id      = aws_vpc.vpc.id
-
-  ingress {
-    from_port   = 8080
-    to_port     = 8080
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "Allow Jenkins server access from the world"
-  }
-
-  ingress {
-    from_port   = 8500
-    to_port     = 8500
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "Allow consul UI access from the world"
-  }
-
-  ingress {
-    from_port   = 5000
-    to_port     = 5000
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "Allow Kandula App access from the world"
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = -1
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "Allow all outside security group"
-  }
-}
-
 resource "aws_security_group" "consul_server_sg" {
   name               = "${var.project_name}_consul_server_sg"
   vpc_id             = aws_vpc.vpc.id
@@ -105,7 +67,7 @@ resource "aws_security_group" "jenkins_server_sg" {
 }
 
 resource "aws_security_group" "kandula_sg" {
-  name               = "${var.project_name}_kandula_sg"
+  name               = "${var.project_name}_sg"
   vpc_id             = aws_vpc.vpc.id
   description        = "Allow consul inbound traffic"
 
@@ -117,26 +79,12 @@ resource "aws_security_group" "kandula_sg" {
     description = "Allow all inside security group"
   }
 
-  egress {
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
-    cidr_blocks     = ["0.0.0.0/0"]
-    description     = "Allow all outside security group"
-  }
-}
-
-resource "aws_security_group" "ssh_sg" {
-  name               = "${var.project_name}_ssh_sg"
-  vpc_id             = aws_vpc.vpc.id
-  description        = "Allow SSH inbound traffic"
-
   ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "Allow SSH inbound traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = -1
+    cidr_blocks = ["172.31.0.0/16"]
+    description = "Allow jenkins UI access from the world"
   }
 
   egress {
@@ -160,7 +108,68 @@ resource "aws_security_group" "all_worker_mgmt" {
     cidr_blocks = [
       "10.0.0.0/8",
       "172.16.0.0/12",
-      "192.168.0.0/16",
+      "192.168.0.0/16"
     ]
   }
 }
+
+# resource "aws_security_group" "ssh_sg" {
+#   name               = "${var.project_name}_ssh_sg"
+#   vpc_id             = aws_vpc.vpc.id
+#   description        = "Allow SSH inbound traffic"
+
+#   ingress {
+#     from_port   = 22
+#     to_port     = 22
+#     protocol    = "tcp"
+#     cidr_blocks = ["0.0.0.0/0"]
+#     description = "Allow SSH inbound traffic"
+#   }
+
+#   egress {
+#     from_port       = 0
+#     to_port         = 0
+#     protocol        = "-1"
+#     cidr_blocks     = ["0.0.0.0/0"]
+#     description     = "Allow all outside security group"
+#   }
+# }
+
+
+# resource "aws_security_group" "alb_sg" {
+#   name        = "${var.project_name}_alb_sg"
+#   description = "Allow HTTP"
+#   vpc_id      = aws_vpc.vpc.id
+
+#   ingress {
+#     from_port   = 8080
+#     to_port     = 8080
+#     protocol    = "tcp"
+#     cidr_blocks = ["0.0.0.0/0"]
+#     description = "Allow Jenkins server access from the world"
+#   }
+
+#   ingress {
+#     from_port   = 8500
+#     to_port     = 8500
+#     protocol    = "tcp"
+#     cidr_blocks = ["0.0.0.0/0"]
+#     description = "Allow consul UI access from the world"
+#   }
+
+#   ingress {
+#     from_port   = 5000
+#     to_port     = 5000
+#     protocol    = "tcp"
+#     cidr_blocks = ["0.0.0.0/0"]
+#     description = "Allow Kandula App access from the world"
+#   }
+
+#   egress {
+#     from_port   = 0
+#     to_port     = 0
+#     protocol    = -1
+#     cidr_blocks = ["0.0.0.0/0"]
+#     description = "Allow all outside security group"
+#   }
+# }

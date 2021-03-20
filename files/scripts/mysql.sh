@@ -87,60 +87,26 @@ systemctl daemon-reload
 systemctl enable consul.service
 systemctl start consul.service
 
-wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo apt-key add -
-sh -c 'echo deb https://pkg.jenkins.io/debian-stable binary/ > \
-    /etc/apt/sources.list.d/jenkins.list'
-apt-get update -y
-apt install openjdk-8-jdk -y
-apt-get install jenkins -y
-apt install docker.io -y
-systemctl start docker
-systemctl enable docker
-usermod -aG docker ubuntu
-apt-get update && sudo apt-get install -y apt-transport-https gnupg2 curl
-curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
-apt-get update
-apt-get install -y kubectl
-
-# Install Helm
-curl https://baltocdn.com/helm/signing.asc | sudo apt-key add -
-apt-get install apt-transport-https --yes
-echo "deb https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
-apt-get update -y
-apt-get install helm
-
 tee /etc/consul.d/jenkins-server.json > /dev/null <<"EOF"
 {
   "service": {
-    "id": "jenkins-server",
-    "name": "jenkins-server",
-    "port": 8080,
+    "id": "mysql",
+    "name": "mysql",
     "checks": [
       {
-        "id": "tcp",
-        "name": "TCP on port 8080",
-        "tcp": "localhost:8080",
-        "interval": "10s",
-        "timeout": "1s"
-      },
-      {
-        "id": "http",
-        "name": "HTTP on port 8080",
-        "http": "http://localhost:8080/login",
-        "interval": "30s",
-        "timeout": "1s"
-      },
-      {
         "id": "service",
-        "name": "jenkins server service",
-        "args": ["systemctl", "status", "jenkins.service"],
+        "name": "mysql service",
+        "args": ["systemctl", "status", "mysql.service"],
         "interval": "60s"
-      }
+      }     
     ]
   }
 }
 EOF
+
+# install mysql
+
+apt install mysql-server -y
 
 # Install NodeExporter
 
@@ -181,3 +147,4 @@ systemctl enable node_exporter
 
 consul reload
 exit 0
+

@@ -87,60 +87,90 @@ systemctl daemon-reload
 systemctl enable consul.service
 systemctl start consul.service
 
-wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo apt-key add -
-sh -c 'echo deb https://pkg.jenkins.io/debian-stable binary/ > \
-    /etc/apt/sources.list.d/jenkins.list'
-apt-get update -y
-apt install openjdk-8-jdk -y
-apt-get install jenkins -y
-apt install docker.io -y
-systemctl start docker
-systemctl enable docker
-usermod -aG docker ubuntu
-apt-get update && sudo apt-get install -y apt-transport-https gnupg2 curl
-curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
-apt-get update
-apt-get install -y kubectl
-
-# Install Helm
-curl https://baltocdn.com/helm/signing.asc | sudo apt-key add -
-apt-get install apt-transport-https --yes
-echo "deb https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
-apt-get update -y
-apt-get install helm
-
 tee /etc/consul.d/jenkins-server.json > /dev/null <<"EOF"
 {
   "service": {
-    "id": "jenkins-server",
-    "name": "jenkins-server",
-    "port": 8080,
+    "id": "elasticsearch",
+    "name": "elasticsearch",
     "checks": [
       {
-        "id": "tcp",
-        "name": "TCP on port 8080",
-        "tcp": "localhost:8080",
-        "interval": "10s",
-        "timeout": "1s"
-      },
-      {
-        "id": "http",
-        "name": "HTTP on port 8080",
-        "http": "http://localhost:8080/login",
-        "interval": "30s",
-        "timeout": "1s"
-      },
-      {
         "id": "service",
-        "name": "jenkins server service",
-        "args": ["systemctl", "status", "jenkins.service"],
+        "name": "elasticsearch service",
+        "args": ["systemctl", "status", "elasticsearch.service"],
         "interval": "60s"
-      }
+      }     
     ]
   }
 }
 EOF
+
+# Install ElasticSearch
+
+echo "INFO: userdata started"
+
+# elasticsearch
+wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-oss-7.10.2-amd64.deb
+dpkg -i elasticsearch-*.deb
+systemctl enable elasticsearch
+systemctl start elasticsearch
+
+# kibana
+wget https://artifacts.elastic.co/downloads/kibana/kibana-oss-7.10.2-amd64.deb
+dpkg -i kibana-*.deb
+echo 'server.host: "0.0.0.0"' > /etc/kibana/kibana.yml
+systemctl enable kibana
+systemctl start kibana
+
+# filebeat
+wget https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-oss-7.11.0-amd64.deb
+dpkg -i filebeat-*.deb
+
+
+sudo mv /etc/filebeat/filebeat.yml /etc/filebeat/filebeat.yml.BCK
+
+cat <<\EOF > /etc/filebeat/filebeat.yml
+filebeat.inputs:
+  - type: log
+    enabled: false
+    paths:
+      - /var/log/auth.log
+filebeat.modules:
+  - module: system
+    syslog:
+      enabled: false
+    auth:
+      enabled: false
+  - module: mysql
+    error:
+      enabled: true
+    slowlog:
+      enabled: true
+filebeat.config.modules:
+  path: ${path.config}/modules.d/*.yml
+  reload.enabled: false
+setup.dashboards.enabled: false
+setup.template.name: "filebeat"
+setup.template.pattern: "filebeat-*"
+setup.template.settings:
+  index.number_of_shards: 1
+processors:
+  - add_host_metadata:
+      when.not.contains.tags: forwarded
+  - add_cloud_metadata: ~
+output.elasticsearch:
+  hosts: [ "localhost:9200" ]
+  index: "filebeat-%{[agent.version]}-%{+yyyy.MM.dd}"
+## OR
+#output.logstash:
+#  hosts: [ "127.0.0.1:5044" ]
+EOF
+
+echo "INFO: userdata finished"
+
+echo 'network.host: 0.0.0.0' >> /etc/elasticsearch/elasticsearch.yml
+echo 'discovery.type: single-node' >> /etc/elasticsearch/elasticsearch.yml
+
+systemctl restart elasticsearch
 
 # Install NodeExporter
 
