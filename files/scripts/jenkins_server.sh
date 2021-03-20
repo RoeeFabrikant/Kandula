@@ -113,8 +113,8 @@ apt-get install helm
 tee /etc/consul.d/jenkins-server.json > /dev/null <<"EOF"
 {
   "service": {
-    "id": "jenkins_server",
-    "name": "jenkins_server",
+    "id": "jenkins-server",
+    "name": "jenkins-server",
     "port": 8080,
     "checks": [
       {

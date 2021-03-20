@@ -23,7 +23,7 @@ module "consul_servers" {
     project_name                 = "kandula"
     server_name                  = "consul_server"
     intance_type                 = "t2.micro"
-    dns_name                     = "kandula_consul_server"
+    dns_name                     = "kandula-consul-server"
     private_key_name             = var.KP
 
     tags = {
@@ -46,7 +46,7 @@ module "jenkins_server" {
     project_name                 = "kandula"
     server_name                  = "jenkins_server"
     intance_type                 = "t2.micro"
-    dns_name                     = "kandula_jenkins_server"
+    dns_name                     = "kandula-jenkins-server"
     private_key_name             = var.KP
 
     tags = {
@@ -69,7 +69,7 @@ module "jenkins_agent" {
     project_name                 = "kandula"
     server_name                  = "jenkins_agent"
     intance_type                 = "t2.micro"
-    dns_name                     = "kandula_jenkins_agent"
+    dns_name                     = "kandula-jenkins-agent"
     private_key_name             = var.KP
 
     tags = {
@@ -92,12 +92,35 @@ module "mysql" {
     project_name                 = "kandula"
     server_name                  = "mysql"
     intance_type                 = "t2.micro"
-    dns_name                     = "kandula_mysql_server"
+    dns_name                     = "kandula-mysql-server"
     private_key_name             = var.KP
 
     tags = {
         consul_server = "false"
         type          = "mysql_server"
+        version       = "1.0"
+    }
+}
+
+module "mysql" {
+    source = "./modules/instance"
+
+    num_of_instances             = 1
+    sub_id                       = module.vpc.private_sub                      # Don't change this line
+    server_sg                    = [module.vpc.kandula_sg]                     # Don't change this line
+    iam                          = module.vpc.consul_iam_profile               # Don't change this line 
+    route53_zone_id              = module.vpc.aws_route53_zone_id
+
+    script                       = "./files/scripts/elk.sh"
+    project_name                 = "kandula"
+    server_name                  = "elk"
+    intance_type                 = "t3.medium"
+    dns_name                     = "kandula-elk-server"
+    private_key_name             = var.KP
+
+    tags = {
+        consul_server = "false"
+        type          = "elk_server"
         version       = "1.0"
     }
 }

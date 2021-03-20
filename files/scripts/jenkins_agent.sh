@@ -112,8 +112,8 @@ apt-get install helm
 tee /etc/consul.d/jenkins-agent.json > /dev/null <<"EOF"
 {
   "service": {
-    "id": "jenkins_agent",
-    "name": "jenkins_agent",
+    "id": "jenkins-agent",
+    "name": "jenkins-agent",
     "checks": [
       {
         "id": "service",
